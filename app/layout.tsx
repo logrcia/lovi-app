@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
+import { Fraunces, Geist } from "next/font/google";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -9,8 +8,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Lovi · tus recuerdos de mascotas",
+  description:
+    "Lovi es un diario visual e íntimo para guardar, organizar y revivir los recuerdos compartidos con tus mascotas.",
 };
 
 const geistSans = Geist({
@@ -19,22 +19,22 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  display: "swap",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+    <html lang="es" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${fraunces.variable} antialiased`}>
+        {children}
       </body>
     </html>
   );

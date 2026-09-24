@@ -2,59 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Lovi · dirección de arte
+  Palette oficial:
+  - crema / blanco cálido  #F9F2E4
+  - verde oscuro casi negro #282B0A
+  - naranja                #F39D23
+  - fucsia                 #D51993
+  - amarillo               #F5D244
+  - azul                   #294EA7
+*/
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
+    --background: 40 64% 94%; /* cream #F9F2E4 */
+    --foreground: 65 62% 10%; /* ink #282B0A */
+    --card: 44 100% 97%; /* parchment #FFFBF0 */
+    --card-foreground: 65 62% 10%;
+    --popover: 40 64% 94%;
+    --popover-foreground: 65 62% 10%;
+    --primary: 35 90% 55%; /* orange #F39D23 */
+    --primary-foreground: 65 62% 10%; /* ink on orange */
+    --secondary: 321 79% 47%; /* fucsia #D51993 */
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --muted: 41 35% 86%;
+    --muted-foreground: 65 20% 32%;
+    --accent: 48 90% 61%; /* butter #F5D244 */
+    --accent-foreground: 65 62% 10%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 65 62% 10%; /* ink borders everywhere */
+    --input: 65 62% 10%;
+    --ring: 35 90% 55%;
+    --chart-1: 35 90% 55%;
+    --chart-2: 321 79% 47%;
+    --chart-3: 222 61% 41%;
+    --chart-4: 48 90% 61%;
+    --chart-5: 65 62% 10%;
+    --radius: 0.75rem;
   }
 }
 
@@ -62,7 +47,73 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  html {
+    @apply bg-cream;
   }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01" on, "cv01" on;
+  }
+  ::selection {
+    @apply bg-fucsia text-cream;
+  }
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+  }
+}
+
+@layer components {
+  /* Encabezado tipo journal: título grande, display serif */
+  .lovi-headline {
+    @apply font-display text-3xl font-semibold tracking-tight text-ink md:text-5xl;
+  }
+
+  /* Botón principal de la app: Loviar */
+  .btn-loviar {
+    @apply inline-flex items-center justify-center gap-2 border-2 border-ink bg-fucsia px-5 py-2.5 font-sans text-sm font-bold uppercase tracking-widest text-cream shadow-sticker transition-all hover:-rotate-2 hover:bg-orange hover:text-ink active:translate-x-1 active:translate-y-1 active:shadow-none;
+  }
+
+  .btn-ink {
+    @apply inline-flex items-center justify-center gap-2 border-2 border-ink bg-cream px-4 py-2 font-sans text-sm font-bold uppercase tracking-wider text-ink shadow-sticker-sm transition-all hover:bg-butter active:translate-x-1 active:translate-y-1 active:shadow-none;
+  }
+
+  .btn-ghost-ink {
+    @apply inline-flex items-center justify-center gap-2 border-2 border-ink px-4 py-2 font-sans text-sm font-bold uppercase tracking-wider text-ink transition-colors hover:bg-ink hover:text-cream;
+  }
+
+  /* Card Lovi: no es un rectángulo blanco genérico */
+  .card-lovi {
+    @apply relative border-2 border-ink bg-parchment shadow-sticker;
+  }
+
+  /* Etiqueta tipo sticker */
+  .sticker {
+    @apply inline-block border-2 border-ink px-2 py-1 font-sans text-[11px] font-bold uppercase tracking-widest;
+  }
+
+  /* Separador zigzag (scrapbook) */
+  .zigzag {
+    height: 10px;
+    background: linear-gradient(
+        135deg,
+        hsl(65 62% 10%) 25%,
+        transparent 25%
+      ),
+      linear-gradient(225deg, hsl(65 62% 10%) 25%, transparent 25%);
+    background-size: 14px 14px;
+  }
+
+  /* Sello / marca decorativa */
+  .stamp {
+    @apply inline-block rotate-[-6deg] border-[3px] border-fucsia px-3 py-1 font-sans text-xs font-black uppercase tracking-[0.25em] text-fucsia;
+  }
+}
+
+/* Borde irregular suave para imágenes */
+.img-scrap {
+  @apply border-2 border-ink;
+  border-radius: 4px 12px 6px 14px / 10px 6px 12px 5px;
 }

@@ -51,11 +51,37 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        // ---- Lovi palette (official art direction) ----
+        cream: "#F9F2E4",
+        parchment: "#FFFBF0",
+        ink: "#282B0A",
+        orange: "#F39D23",
+        fucsia: "#D51993",
+        butter: "#F5D244",
+        navy: "#294EA7",
+      },
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["var(--font-fraunces)", "Georgia", "serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        sticker: "4px 4px 0 0 hsl(65 62% 10%)",
+        "sticker-sm": "3px 3px 0 0 hsl(65 62% 10%)",
+        pop: "6px 6px 0 0 hsl(65 62% 10%)",
+      },
+      keyframes: {
+        "wiggle-once": {
+          "0%, 100%": { transform: "rotate(-2deg)" },
+          "50%": { transform: "rotate(2deg)" },
+        },
+      },
+      animation: {
+        "wiggle-once": "wiggle-once 0.6s ease-in-out",
       },
     },
   },

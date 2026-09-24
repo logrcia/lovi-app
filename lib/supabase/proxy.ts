@@ -47,8 +47,9 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  // Todo se protege, salvo los flujos públicos de auth. "/" es el feed y
+  // requiere sesión (la página previa de landing no existe en el MVP).
   if (
-    request.nextUrl.pathname !== "/" &&
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth")
