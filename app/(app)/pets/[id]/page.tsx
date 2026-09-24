@@ -45,36 +45,54 @@ export default async function PetDetailPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl">
-      {/* Header compacto sin overlap: la foto vive en su propia caja con
-          bordes, sin absolute ni márgenes negativos. */}
-      <header className="card-lovi mb-6 flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6">
-        <PetImage
-          name={pet.pet_name}
-          src={pet.image}
-          className="h-44 w-44 shrink-0 rounded-2xl"
-          imgClassName="h-full w-full rounded-2xl"
-          tone="bg-orange"
-        />
-        <div className="min-w-0 flex-1">
-          <p className="sticker bg-butter text-ink">mi mascota</p>
-          <h1 className="lovi-headline mt-3">{pet.pet_name}</h1>
-          <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-ink/60">
-            {pet.especie}
-            {pet.birth_date ? ` · nació el ${formatFullDate(pet.birth_date)}` : ""}
-            {petAge(pet) ? ` · ${petAge(pet)}` : ""}
-          </p>
-          {pet.description ? (
-            <p className="mt-3 text-sm leading-relaxed text-ink/85 line-clamp-2">
-              {pet.description}
-            </p>
-          ) : null}
+      {/* Header scrapbook: imagen contenida con leve rotación, info al lado,
+          chips de metadata y botón Editar arriba a la derecha. */}
+      <header className="card-lovi mb-8 overflow-hidden">
+        <div className="flex flex-col items-center gap-6 p-5 sm:flex-row sm:items-start sm:gap-8 sm:p-8">
+          {/* Imagen contenida: nunca ocupa todo el ancho; leve rotación scrapbook */}
+          <div className="shrink-0">
+            <PetImage
+              name={pet.pet_name}
+              src={pet.image}
+              className="h-44 w-44 rotate-[-1.5deg] rounded-2xl sm:h-52 sm:w-52 sm:rotate-[-2deg]"
+              imgClassName="h-full w-full rounded-2xl"
+              tone="bg-orange"
+            />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="sticker bg-butter text-ink">mi mascota</p>
+                <h1 className="lovi-headline mt-3 break-words">{pet.pet_name}</h1>
+              </div>
+              <Link
+                href={`/pets/${pet.pet_id}/edit`}
+                className="btn-ink shrink-0"
+              >
+                Editar
+              </Link>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="sticker bg-navy text-cream">{pet.especie}</span>
+              {pet.birth_date ? (
+                <span className="sticker bg-cream text-ink">
+                  nació el {formatFullDate(pet.birth_date)}
+                </span>
+              ) : null}
+              {petAge(pet) ? (
+                <span className="sticker bg-butter text-ink">{petAge(pet)}</span>
+              ) : null}
+            </div>
+
+            {pet.description ? (
+              <p className="mt-4 max-w-prose text-sm leading-relaxed text-ink/85">
+                {pet.description}
+              </p>
+            ) : null}
+          </div>
         </div>
-        <Link
-          href={`/pets/${pet.pet_id}/edit`}
-          className="btn-ink self-start sm:ml-auto sm:self-center"
-        >
-          Editar
-        </Link>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

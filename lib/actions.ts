@@ -571,4 +571,5 @@ export async function toggleFollow(targetUserId: string): Promise<void> {
   revalidatePath("/");
   revalidatePath("/users");
   revalidatePath(`/users/${targetUserId}`);
+  revalidatePath("/profile");
 }
