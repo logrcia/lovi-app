@@ -14,7 +14,6 @@ import {
   getDayAppointments,
   getDayBirthdays,
   getDayLovis,
-  getDayVaccines,
   getMonthCalendarMarks,
 } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
@@ -31,7 +30,6 @@ const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 const KIND_DOT: Record<CalendarMark["kind"], string> = {
   lovi: "bg-orange",
-  vaccine: "bg-navy",
   appointment: "bg-fucsia",
   birthday: "bg-butter",
 };
@@ -59,14 +57,13 @@ export default async function CalendarPage({ searchParams }: Props) {
 
   // Día seleccionado
   const dayKey = sp.day && /^\d{4}-\d{2}-\d{2}$/.test(sp.day) ? sp.day : null;
-  const [dayLovis, dayVaccines, dayAppointments, dayBirthdays] = dayKey
+  const [dayLovis, dayAppointments, dayBirthdays] = dayKey
     ? await Promise.all([
         getDayLovis(supabase, dayKey),
-        getDayVaccines(supabase, dayKey),
         getDayAppointments(supabase, dayKey),
         getDayBirthdays(supabase, dayKey),
       ])
-    : [[], [], [], []];
+    : [[], [], []];
 
   // Grilla (lunes primero)
   const offset = weekdayIndexMonday(new Date(year, month0, 1));
@@ -87,8 +84,8 @@ export default async function CalendarPage({ searchParams }: Props) {
           <p className="sticker bg-navy text-cream">tu calendario privado</p>
           <h1 className="lovi-headline mt-3">Calendario de recuerdos</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Lovi, vacunas, turnos y cumpleaños, día por día. Tocá un día para
-            ver el detalle.
+            Lovi, turnos y cumpleaños, día por día. Tocá un día para ver el
+            detalle.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -171,12 +168,11 @@ export default async function CalendarPage({ searchParams }: Props) {
 
       <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <CalLabel kind="lovi" label="Lovi" />
-        <CalLabel kind="vaccine" label="Vacuna" />
         <CalLabel kind="appointment" label="Turno" />
         <CalLabel kind="birthday" label="Cumpleaños" />
       </div>
 
-      {dayKey ? <DayDetail dayKey={dayKey} lovis={dayLovis} vaccines={dayVaccines} appointments={dayAppointments} birthdays={dayBirthdays} /> : null}
+      {dayKey ? <DayDetail dayKey={dayKey} lovis={dayLovis} appointments={dayAppointments} birthdays={dayBirthdays} /> : null}
     </div>
   );
 }

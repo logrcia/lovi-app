@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FolderHeart, Syringe, Stethoscope, Camera } from "lucide-react";
+import { FolderHeart, HeartPulse, Stethoscope, Camera } from "lucide-react";
 
 import { PetImage } from "@/components/pet-image";
-import { getAlbumsWithCount, getAppointments, getPet, getPetLovis, getVaccines } from "@/lib/queries";
+import { getAlbumsWithCount, getAppointments, getPet, getPetExams, getPetLovis, getVaccines } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
 import { formatFullDate, petAge } from "@/lib/format";
 
@@ -19,7 +19,7 @@ type Props = { params: Promise<{ id: string }> };
 const SECTIONS = [
   { key: "lovis", label: "Recuerdos", Icon: Camera, tone: "bg-orange" },
   { key: "albums", label: "Álbumes", Icon: FolderHeart, tone: "bg-butter" },
-  { key: "vaccines", label: "Vacunas", Icon: Syringe, tone: "bg-navy" },
+  { key: "medical", label: "Registro médico", Icon: HeartPulse, tone: "bg-butter" },
   { key: "appointments", label: "Turnos", Icon: Stethoscope, tone: "bg-fucsia" },
 ] as const;
 
@@ -29,17 +29,18 @@ export default async function PetDetailPage({ params }: Props) {
   const pet = await getPet(supabase, id);
   if (!pet) notFound();
 
-  const [lovis, albums, vaccines, appointments] = await Promise.all([
+  const [lovis, albums, vaccines, appointments, exams] = await Promise.all([
     getPetLovis(supabase, pet.pet_id),
     getAlbumsWithCount(supabase, pet.pet_id),
     getVaccines(supabase, pet.pet_id),
     getAppointments(supabase, pet.pet_id),
+    getPetExams(supabase, pet.pet_id),
   ]);
 
   const counts: Record<(typeof SECTIONS)[number]["key"], number> = {
     lovis: lovis.length,
     albums: albums.length,
-    vaccines: vaccines.length,
+    medical: vaccines.length + exams.length,
     appointments: appointments.length,
   };
 
@@ -101,7 +102,7 @@ export default async function PetDetailPage({ params }: Props) {
           const target =
             key === "lovis"
               ? `/pets/${pet.pet_id}/memories`
-              : `/pets/${pet.pet_id}/${key === "albums" ? "albums" : key === "vaccines" ? "vaccines" : "appointments"}`;
+              : `/pets/${pet.pet_id}/${key}`;
           return (
             <Link
               key={key}

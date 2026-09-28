@@ -10,6 +10,7 @@ import type {
   LoviMedia,
   LoviWithMedia,
   Pet,
+  PetExam,
   Profile,
   Vaccine,
 } from "./types";
@@ -264,11 +265,21 @@ export async function getAlbum(
 export async function getVaccines(supabase: AuthSupabase, petId: string): Promise<Vaccine[]> {
   const { data, error } = await supabase
     .from("vaccines")
-    .select("vac_id, pet_id, name, date, next_dose")
+    .select("vac_id, pet_id, name, date, next_dose, notes")
     .eq("pet_id", petId)
     .order("date", { ascending: false });
   if (error || !data) return [];
   return data as Vaccine[];
+}
+
+export async function getPetExams(supabase: AuthSupabase, petId: string): Promise<PetExam[]> {
+  const { data, error } = await supabase
+    .from("pet_exams")
+    .select("exam_id, pet_id, name, exam_date, result, notes")
+    .eq("pet_id", petId)
+    .order("exam_date", { ascending: false });
+  if (error || !data) return [];
+  return data as PetExam[];
 }
 
 export async function getAppointments(
@@ -308,7 +319,6 @@ export async function getMonthCalendarMarks(
 
   const [
     { data: loviRows },
-    { data: vaccineRows },
     { data: appointmentRows },
     { data: petRows },
   ] = await Promise.all([
@@ -319,11 +329,6 @@ export async function getMonthCalendarMarks(
       .gte("created_at", `${fromKey}T00:00:00`)
       .lte("created_at", `${toKey}`)
       .order("created_at", { ascending: false }),
-    supabase
-      .from("vaccines")
-      .select("vac_id, name, date, pets(pet_name)")
-      .gte("date", fromKey)
-      .lte("date", toKey),
     supabase
       .from("appointments")
       .select("ap_id, name, date, pets(pet_name)")
@@ -338,15 +343,6 @@ export async function getMonthCalendarMarks(
       label: l.title,
       pet_name: l.pets?.[0]?.pet_name ?? "Mascota",
       hero: true,
-    });
-  }
-
-  for (const v of (vaccineRows ?? []) as { name: string; date: string; pets: { pet_name: string }[] }[]) {
-    marks.push({
-      date: dateKey(v.date),
-      kind: "vaccine",
-      label: v.name,
-      pet_name: v.pets?.[0]?.pet_name ?? "Mascota",
     });
   }
 
@@ -385,21 +381,6 @@ export async function getDayLovis(supabase: AuthSupabase, key: string): Promise<
   if (!user) return [];
   const rows = await fetchLovis(supabase, { creator_user_id: user.id });
   return rows.filter((l) => dateKey(l.created_at) === key);
-}
-
-export async function getDayVaccines(
-  supabase: AuthSupabase,
-  key: string,
-): Promise<(Vaccine & { pet_name: string })[]> {
-  const { data, error } = await supabase
-    .from("vaccines")
-    .select("vac_id, pet_id, name, date, next_dose, pets(pet_name)")
-    .eq("date", key);
-  if (error || !data) return [];
-  return (data as (Vaccine & { pets: { pet_name: string }[] })[]).map((v) => {
-    const { pets, ...rest } = v as typeof v & { pets: { pet_name: string }[] };
-    return { ...rest, pet_name: pets?.[0]?.pet_name ?? "Mascota" };
-  });
 }
 
 export async function getDayAppointments(

@@ -5,14 +5,26 @@ import { useRouter } from "next/navigation";
 import { Loader2, Syringe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Field, TextInput } from "@/components/form";
-import { createVaccine } from "@/lib/actions";
+import { Field, TextArea, TextInput } from "@/components/form";
+import { createVaccine, updateVaccine } from "@/lib/actions";
+import type { Vaccine } from "@/lib/types";
 
-export function VaccineForm({ petId }: { petId: string }) {
+export function VaccineForm({
+  petId,
+  initial,
+  onSaved,
+  onCancel,
+}: {
+  petId: string;
+  initial?: Vaccine | null;
+  onSaved?: () => void;
+  onCancel?: () => void;
+}) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [date, setDate] = useState("");
-  const [nextDose, setNextDose] = useState("");
+  const [name, setName] = useState(initial?.name ?? "");
+  const [date, setDate] = useState(initial?.date ?? "");
+  const [nextDose, setNextDose] = useState(initial?.next_dose ?? "");
+  const [notes, setNotes] = useState(initial?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -20,19 +32,32 @@ export function VaccineForm({ petId }: { petId: string }) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const result = await createVaccine({
-        pet_id: petId,
-        name,
-        date,
-        next_dose: nextDose || null,
-      });
+      const result = initial
+        ? await updateVaccine(initial.vac_id, petId, {
+            name,
+            date,
+            next_dose: nextDose || null,
+            notes: notes || null,
+          })
+        : await createVaccine({
+            pet_id: petId,
+            name,
+            date,
+            next_dose: nextDose || null,
+            notes: notes || null,
+          });
       if (!result.ok) {
         setError(result.error);
         return;
       }
-      setName("");
-      setDate("");
-      setNextDose("");
+      if (onSaved) {
+        onSaved();
+      } else {
+        setName("");
+        setDate("");
+        setNextDose("");
+        setNotes("");
+      }
       router.refresh();
     });
   };
@@ -41,7 +66,9 @@ export function VaccineForm({ petId }: { petId: string }) {
     <form onSubmit={onSubmit} className="card-lovi flex flex-col gap-4 px-5 py-5">
       <div className="flex items-center gap-2">
         <Syringe size={18} strokeWidth={2.25} className="text-ink/70" />
-        <h3 className="font-display text-xl font-semibold text-ink">Cargar vacuna</h3>
+        <h3 className="font-display text-xl font-semibold text-ink">
+          {initial ? "Editar vacuna" : "Cargar vacuna"}
+        </h3>
       </div>
 
       <Field label="Nombre" htmlFor="vac-name">
@@ -63,18 +90,32 @@ export function VaccineForm({ petId }: { petId: string }) {
         </Field>
       </div>
 
+      <Field label="Nota" htmlFor="vac-notes" hint="Opcional.">
+        <TextArea
+          id="vac-notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Ej: aplicada en la veterinaria del barrio…"
+        />
+      </Field>
+
       {error && (
         <p className="rounded-md border-2 border-fucsia bg-fucsia/10 px-3 py-2 text-sm text-ink">{error}</p>
       )}
 
-      <div>
+      <div className="flex flex-wrap gap-2">
         <Button
           type="submit"
           disabled={isPending}
           className="bg-navy font-bold uppercase tracking-wider text-cream shadow-sticker-sm hover:rotate-1 hover:bg-butter hover:text-ink"
         >
-          {isPending ? <Loader2 className="animate-spin" /> : "Guardar vacuna"}
+          {isPending ? <Loader2 className="animate-spin" /> : initial ? "Guardar cambios" : "Guardar vacuna"}
         </Button>
+        {onCancel ? (
+          <button type="button" onClick={onCancel} className="btn-ghost-ink">
+            Cancelar
+          </button>
+        ) : null}
       </div>
     </form>
   );

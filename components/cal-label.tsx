@@ -3,7 +3,6 @@ import type { CalendarMark } from "@/lib/types";
 
 const KIND_DOT: Record<CalendarMark["kind"], string> = {
   lovi: "bg-orange",
-  vaccine: "bg-navy",
   appointment: "bg-fucsia",
   birthday: "bg-butter",
 };

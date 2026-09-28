@@ -389,6 +389,7 @@ export async function createVaccine(input: {
   name: string;
   date: string;
   next_dose: string | null;
+  notes: string | null;
 }): Promise<ActionResult> {
   const supabase = await createClient();
   const {
@@ -406,11 +407,42 @@ export async function createVaccine(input: {
     name,
     date: input.date,
     next_dose: input.next_dose || null,
+    notes: input.notes || null,
   });
   if (error) return { ok: false, error: error.message };
 
+  revalidatePath(`/pets/${input.pet_id}/medical`);
   revalidatePath(`/pets/${input.pet_id}/vaccines`);
-  revalidatePath("/calendar");
+  revalidatePath(`/pets/${input.pet_id}`);
+  return { ok: true };
+}
+
+export async function updateVaccine(
+  vacId: string,
+  petId: string,
+  input: { name: string; date: string; next_dose: string | null; notes: string | null },
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autenticado." };
+
+  const name = input.name.trim();
+  if (!name || !input.date) {
+    return { ok: false, error: "Nombre y fecha son obligatorios." };
+  }
+
+  const { error } = await supabase
+    .from("vaccines")
+    .update({ name, date: input.date, next_dose: input.next_dose || null, notes: input.notes || null })
+    .eq("vac_id", vacId)
+    .eq("pet_id", petId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/pets/${petId}/medical`);
+  revalidatePath(`/pets/${petId}/vaccines`);
+  revalidatePath(`/pets/${petId}`);
   return { ok: true };
 }
 
@@ -431,8 +463,92 @@ export async function deleteVaccine(
     .eq("pet_id", petId);
   if (error) return { ok: false, error: error.message };
 
+  revalidatePath(`/pets/${petId}/medical`);
   revalidatePath(`/pets/${petId}/vaccines`);
-  revalidatePath("/calendar");
+  revalidatePath(`/pets/${petId}`);
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Estudios y controles
+// ---------------------------------------------------------------------------
+
+export async function createPetExam(input: {
+  pet_id: string;
+  name: string;
+  exam_date: string;
+  result: string | null;
+  notes: string | null;
+}): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autenticado." };
+
+  const name = input.name.trim();
+  if (!name || !input.exam_date) {
+    return { ok: false, error: "Nombre y fecha son obligatorios." };
+  }
+
+  const { error } = await supabase.from("pet_exams").insert({
+    pet_id: input.pet_id,
+    name,
+    exam_date: input.exam_date,
+    result: input.result || null,
+    notes: input.notes || null,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/pets/${input.pet_id}/medical`);
+  revalidatePath(`/pets/${input.pet_id}`);
+  return { ok: true };
+}
+
+export async function updatePetExam(
+  examId: string,
+  petId: string,
+  input: { name: string; exam_date: string; result: string | null; notes: string | null },
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autenticado." };
+
+  const name = input.name.trim();
+  if (!name || !input.exam_date) {
+    return { ok: false, error: "Nombre y fecha son obligatorios." };
+  }
+
+  const { error } = await supabase
+    .from("pet_exams")
+    .update({ name, exam_date: input.exam_date, result: input.result || null, notes: input.notes || null })
+    .eq("exam_id", examId)
+    .eq("pet_id", petId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/pets/${petId}/medical`);
+  revalidatePath(`/pets/${petId}`);
+  return { ok: true };
+}
+
+export async function deletePetExam(petId: string, examId: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autenticado." };
+
+  const { error } = await supabase
+    .from("pet_exams")
+    .delete()
+    .eq("exam_id", examId)
+    .eq("pet_id", petId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/pets/${petId}/medical`);
+  revalidatePath(`/pets/${petId}`);
   return { ok: true };
 }
 

@@ -49,6 +49,16 @@ export type Vaccine = {
   name: string;
   date: string;
   next_dose: string | null;
+  notes: string | null;
+};
+
+export type PetExam = {
+  exam_id: string;
+  pet_id: string;
+  name: string;
+  exam_date: string;
+  result: string | null;
+  notes: string | null;
 };
 
 export type Appointment = {
@@ -74,7 +84,7 @@ export type AlbumWithCount = Album & { lovis_count: number };
 
 export type CalendarMark = {
   date: string; // yyyy-mm-dd
-  kind: "lovi" | "vaccine" | "appointment" | "birthday";
+  kind: "lovi" | "appointment" | "birthday";
   label: string;
   pet_name: string;
   hero?: boolean;
